@@ -1,0 +1,4 @@
+d:
+d:data
+i:data/mario_left.png
+i:data/mario_right.png

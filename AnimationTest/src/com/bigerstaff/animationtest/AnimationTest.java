@@ -36,21 +36,21 @@ public class AnimationTest implements ApplicationListener {
 		//Load Assets
 		manager.load("data/mario_right.png", Texture.class);
 		manager.load("data/mario_left.png", Texture.class);
-		//Create Animation Frames, there must be a better way than this.
 		while (manager.update() == false) {
 			Gdx.app.log("Loading", "Loading from asset manager");
 		}
 		Gdx.app.log("Loading", "Done!");
 		Texture rightTexture = manager.get("data/mario_right.png", Texture.class);
 		Texture leftTexture = manager.get("data/mario_left.png", Texture.class);
-	
+
+		//Create Animation Frames, there must be a better way than this.
 		right1 = new TextureRegion(rightTexture, 0,0, 15,27);
 		right2 = new TextureRegion(rightTexture, 16,0, 15,27);
 		left1 = new TextureRegion(leftTexture, 0,0, 15,27);
 		left2 = new TextureRegion(leftTexture, 16,0, 15,27);
 		//Create Animation
-		rightAnimation = new Animation(0.2f, right1, right2);
-		leftAnimation = new Animation(0.2f, left1, left2);
+		rightAnimation = new Animation(0.1f, right1, right2);
+		leftAnimation = new Animation(0.1f, left1, left2);
 		//Start player facing right
 		facingRight = true;
 		//Temp State timer
@@ -68,9 +68,12 @@ public class AnimationTest implements ApplicationListener {
 
 	@Override
 	public void dispose() {
-		manager.dispose();
-		batch.dispose();
-
+		Gdx.app.log("Log", "Closing");
+		//Why does the below crash?!
+		//rightTexture.dispose();
+		//leftTexture.dispose();
+		//batch.dispose();
+		//manager.dispose();
 	}
 
 	@Override
@@ -84,16 +87,16 @@ public class AnimationTest implements ApplicationListener {
 		batch.begin();      
 		//Is left or right pressed, and show corresponding animation
 		if(Gdx.input.isKeyPressed(Keys.LEFT)) {
+			if (player.x > 0) player.x -= 300 * Gdx.graphics.getDeltaTime();
 			batch.draw(leftAnimation.getKeyFrame(stateTime, true), player.x, player.y);
-			player.x -= 200 * Gdx.graphics.getDeltaTime();
 			facingRight = false;
 		}
 		else if(Gdx.input.isKeyPressed(Keys.RIGHT)) {
+			if (player.x < 1280 - player.width) player.x += 300 * Gdx.graphics.getDeltaTime();
 			batch.draw(rightAnimation.getKeyFrame(stateTime, true), player.x, player.y);
-			player.x += 200 * Gdx.graphics.getDeltaTime();
 			facingRight = true;
 		}
-		else { //No key pressed
+		else { //No key pressed, stop animation and continue facing the same direction
 			if (facingRight){
 				batch.draw(right1,player.x, player.y);
 			}
@@ -110,6 +113,7 @@ public class AnimationTest implements ApplicationListener {
 
 	@Override
 	public void pause() {
+		Gdx.app.log("Log", "Pause");
 	}
 
 	@Override
